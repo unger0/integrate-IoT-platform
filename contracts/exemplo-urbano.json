@@ -1,0 +1,18 @@
+{
+  "versao": "1.0",
+  "id_mensagem": "9fa02b7c-c4fa-41d3-9de1-4fc94300de31",
+  "dispositivo": "ar-centro-03",
+  "tipo": "telemetria",
+  "timestamp": "2026-10-19T05:15:00Z",
+  "local": {
+    "site": "centro",
+    "area": "praca"
+  },
+  "medidas": [
+    {
+      "grandeza": "pm25",
+      "valor": 19.4,
+      "unidade": "ug/m3"
+    }
+  ]
+}

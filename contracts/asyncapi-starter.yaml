@@ -1,0 +1,38 @@
+asyncapi: '3.0.0'
+info:
+  title: Plataforma IoT Integrada - convenções MQTT iniciais
+  version: '0.1.0'
+  description: Exemplo parcial. Contrato completo, ACL e credenciais obrigatórios no MVP final.
+channels:
+  telemetria:
+    address: '{inquilino}/{site}/{dominio}/{dispositivo}/telemetria'
+    parameters:
+      inquilino: {description: Inquilino, schema: {type: string}}
+      site: {description: Local, schema: {type: string}}
+      dominio: {description: Domínio configurável, schema: {type: string}}
+      dispositivo: {description: Identificador do dispositivo, schema: {type: string}}
+    messages:
+      mensagemTelemetria:
+        $ref: '#/components/messages/Telemetria'
+operations:
+  publicarTelemetria:
+    action: receive
+    channel:
+      $ref: '#/channels/telemetria'
+    messages:
+      - $ref: '#/channels/telemetria/messages/mensagemTelemetria'
+components:
+  messages:
+    Telemetria:
+      name: Telemetria
+      contentType: application/json
+      payload:
+        type: object
+        required: [versao, id_mensagem, dispositivo, tipo, timestamp, medidas]
+        properties:
+          versao: {type: string}
+          id_mensagem: {type: string, format: uuid}
+          dispositivo: {type: string}
+          tipo: {type: string}
+          timestamp: {type: string, format: date-time}
+          medidas: {type: array, items: {type: object}}

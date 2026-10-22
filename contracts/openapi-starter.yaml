@@ -1,0 +1,36 @@
+openapi: 3.0.3
+info:
+  title: Plataforma IoT Integrada - API inicial (laboratório)
+  version: 0.1.0
+  description: Apenas um subconjunto ilustrativo da API pretendida; a API de produção requer OIDC/RBAC e todos os contratos completos.
+servers:
+  - url: http://localhost:8000
+paths:
+  /health:
+    get:
+      summary: Diagnóstico simples de laboratório
+      responses:
+        '200': {description: OK}
+  /api/v1/dispositivos:
+    post:
+      summary: Cadastrar dispositivo (laboratório, sem emissão de credenciais)
+      responses:
+        '201': {description: Dispositivo cadastrado}
+  /api/v1/ingestao:
+    post:
+      summary: Receber telemetria HTTP (subconjunto do contrato canônico)
+      responses:
+        '202': {description: Aceita ou duplicada sem repetir persistência}
+        '400': {description: Erro de validação}
+  /api/v1/ingestao/lote:
+    post:
+      summary: Receber lote com resultado por mensagem
+      responses:
+        '200': {description: Relatório individual de aceitação/recusa}
+  /api/v1/dispositivos/{id}/telemetria:
+    get:
+      summary: Histórico ordenado por timestamp original
+      parameters:
+        - {name: id, in: path, required: true, schema: {type: string}}
+      responses:
+        '200': {description: Lista de medições}
