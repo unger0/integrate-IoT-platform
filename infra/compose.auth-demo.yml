@@ -1,0 +1,13 @@
+# SEGURANÇA DEMONSTRATIVA opt-in: JWT HS256 por organização/papel na API central.
+# NÃO é OIDC, MFA, TLS, credenciamento de dispositivos, autenticação MQTT ou segurança de produção.
+services:
+  api:
+    environment:
+      IOT_LAB_AUTH_MODE: jwt
+      IOT_LAB_JWT_SECRET: ${IOT_LAB_JWT_SECRET:?Crie chave usando script linux/09-iniciar-protegido.sh}
+  edge:
+    environment:
+      IOT_LAB_EDGE_BEARER: ${IOT_LAB_EDGE_BEARER:?Execute script linux/09-iniciar-protegido.sh}
+  mqtt-bridge:
+    environment:
+      IOT_LAB_MQTT_BEARER: ${IOT_LAB_MQTT_BEARER:?Execute script linux/09-iniciar-protegido.sh}

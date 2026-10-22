@@ -1,72 +1,90 @@
-# Plataforma IoT Integrada — Arch Linux (kit de laboratório, v0.3.0)
+# Plataforma IoT Integrada — Laboratório v0.7.0 (Arch Linux)
 
-**Ambiente principal:** notebook com Arch Linux; serviços em Docker Engine e Docker Compose; scripts em Bash/Python; frontend React opcional. 
+**Novo:** aba **Observabilidade**, resumo histórico por organização, exportador Prometheus
+com acesso global restrito no JWT demonstrativo e logs JSON com ID de correlação.
+Não inclui stack Prometheus/Grafana ou rastreamento distribuído completo.
 
-**Referência:** Documento de Requisitos — Plataforma IoT Integrada, UniEVANGÉLICA, v2.0 (19/10/2026).
+- Aplicar pacote incremental: `IoT_ArchLinux_atualizacao_v0.7.0.zip` sobre a pasta existente.
+- Atualizar com backup e testes: `./scripts/linux/19-atualizar-v070.sh`.
+- Verificação somente-leitura: `./scripts/linux/18-validar-observabilidade.sh`.
+- Abrir painel: `./scripts/linux/07-iniciar-painel.sh`, opção **Observabilidade**.
+- Guia: [docs/13-observabilidade-v070.md](docs/13-observabilidade-v070.md).
 
-> **NÃO é o MVP completo nem uma implantação de produção.** Senhas fixas de demonstração, broker MQTT anônimo, API HTTP sem autenticação e fila SQLite não criptografada. Executar exclusivamente em localhost, com dados sintéticos.
+**Continua sendo laboratório local com dados sintéticos.** Não exponha a API ou o broker
+à Internet. O token JWT local não é OIDC/MFA e a fila da borda ainda não é criptografada.
 
-## Início rápido — Arch Linux
+---
 
-Leia **[docs/05-arch-linux.md](docs/05-arch-linux.md)** para instalar e preparar Docker no Arch, incluindo riscos de permissões do grupo `docker`.
+# Plataforma IoT Integrada — Laboratório v0.6.0 (Arch Linux)
 
-Depois de extrair o ZIP e entrar nesta pasta:
+**Evolução v0.6.0: diagnóstico da pontualidade dos dispositivos.** A aba **Operação** mostra quais dispositivos enviaram leituras recentemente, quais estão atrasados, sem dados, sem perfil ou com timestamp inconsistente. O cálculo utiliza o horário da medição e o intervalo configurado no perfil (tolerância de 2× o intervalo); **não comprova se o equipamento está conectado à rede**. O resultado é apenas para laboratório, não gera alarmes e não modifica o banco.
+
+- Atualização incremental: `IoT_ArchLinux_atualizacao_v0.6.0.zip`, extraída sobre a pasta existente.
+- Aplicar e verificar: `./scripts/linux/17-atualizar-v060.sh` (backup antes da reconstrução).
+- Repetir verificação somente-leitura: `./scripts/linux/16-validar-operacao.sh`.
+- Interface: `./scripts/linux/07-iniciar-painel.sh` (se já estava em execução, recarregue a página).
+- Documentação: [docs/12-estado-dispositivos-v060.md](docs/12-estado-dispositivos-v060.md).
+
+A API continua em modo aberto ou JWT demonstrativo, conforme sua instalação. **Não é uma implementação de OIDC, MFA ou segurança de produção.** Não use com equipamentos físicos ou dados reais.
+
+---
+
+# Plataforma IoT Integrada — Laboratório v0.5.0 + Interface v0.5.1 (Arch Linux)
+
+**Nova versão:** regras configuráveis de limiar e alarmes com reconhecimento/resolução no painel. Preserva ingestão HTTP, MQTT experimental, nó de borda SQLite, PostgreSQL, perfis de dispositivo, painel React e JWT didático opcional das versões anteriores.
+
+**Interface v0.5.1:** distingue erro de conexão de token pendente, valida o token antes de carregar dados e apresenta diagnóstico somente-leitura. Veja [docs/11-painel-acesso-v051.md](docs/11-painel-acesso-v051.md).
+
+**Guia de atualização e limitações:** [docs/10-motor-de-regras-v050.md](docs/10-motor-de-regras-v050.md).
+
+## Atualizar a instalação existente (v0.4 → v0.5)
 
 ```bash
-./scripts/linux/00-verificar-ambiente.sh
+unzip -o ~/Downloads/IoT_ArchLinux_atualizacao_v0.5.0.zip -d ~/Projetos/IoT/
+cd ~/Projetos/IoT/Plataforma_IoT_Integrada_ArchLinux
+./scripts/linux/13-atualizar-v050.sh  # cria backup e preserva modo aberto/JWT demonstrativo
+./scripts/linux/12-demonstrar-alarmes.sh
+```
+
+Se a API antiga estiver desligada, o script 13 pedirá para iniciá-la antes. Se estava em modo JWT, o script renova o token de `runtime/token-gestor.txt`.
+
+Painel: `http://127.0.0.1:5173` (execute `./scripts/linux/07-iniciar-painel.sh` em um terminal) · Swagger: `http://127.0.0.1:8000/docs`.
+
+**Atenção:** isto ainda é um laboratório, sem OIDC, MFA, TLS, ACL MQTT ou proteção de produção. Não exponha o servidor à Internet nem conecte atuadores reais.
+
+---
+
+## Continuar o laboratório 0.3 (compatível)
+
+```bash
 ./scripts/linux/01-iniciar-laboratorio.sh
-./scripts/linux/02-demonstrar-fluxo.sh
-./scripts/linux/06-demonstrar-perfis.sh   # novo: cadastro e validação de perfis
-./scripts/linux/03-teste-desconexao.sh    # opcional: interrompe/restaura só a API
-./scripts/linux/04-encerrar-laboratorio.sh
+./scripts/linux/07-iniciar-painel.sh
 ```
 
-Para abrir a nova interface de gestão: `./scripts/linux/07-iniciar-painel.sh` (primeira execução instala bibliotecas npm). Teste somente-leitura dos novos endpoints: `./scripts/linux/08-validar-painel.sh`.
+Swagger: http://127.0.0.1:8000/docs · Painel: http://127.0.0.1:5173
 
-Para MQTT experimental, use `./scripts/linux/05-demo-mqtt.sh`. Para frontend React: `cd apps/web && npm install && npm run dev`.
+## Testar autorização por organização (opcional)
 
-**Novidade 0.3.0:** [docs/08-painel-v030.md](docs/08-painel-v030.md) — interface web de dispositivos, perfis e histórico, com dois endpoints de listagem. Preserva o fluxo de 0.2.0.
-
-**Histórico 0.2.0:** [docs/07-perfis-v020.md](docs/07-perfis-v020.md) — guia de atualização com backup e prova de classificação de leituras, mantendo a compatibilidade com o fluxo anterior.
-
-**Documentos:** [migração/portabilidade](docs/06-portabilidade-e-migracao.md) · [arquitetura](docs/01-arquitetura.md) · [roteiro](docs/02-roadmap-e-backlog.md) · [testes](docs/03-plano-de-testes.md) · [matriz de requisitos](docs/matriz-rastreabilidade.csv).
-
-**Portabilidade:** não foi necessário reescrever os serviços. O ambiente também pode funcionar em outras distribuições Linux e no Windows com a adaptação das instruções, mas o alvo desta entrega é Arch Linux.
-
-## Objetivo e limites do documento
-
-Construir uma **plataforma de integração IoT, neutra quanto ao cenário e à linguagem**, capaz de receber telemetria de um projeto urbano e de um rural, manter catálogo, perfis, locais, dispositivos, histórico, regras e alarmes, expor APIs e operar com nó de borda por 72 horas sem conectividade, com sincronização sem perdas/duplicações. O documento traz **69 RFs e 18 RNFs**: **33 Essenciais**, 30 Importantes e 6 Desejáveis. O MVP da fase 1 abrange **todos os Essenciais**; o kit entrega só uma primeira fatia funcional, não sua totalidade.
-
-## Organização
-
-```text
-Plataforma_IoT_Integrada_ArchLinux/
-├── README.md                         instruções e limitações
-├── docs/
-│   ├── 00-interpretacao-da-atividade.md
-│   ├── 01-arquitetura.md
-│   ├── 02-roadmap-e-backlog.md
-│   ├── 03-plano-de-testes.md
-│   ├── 04-riscos-e-questoes.md
-│   ├── matriz-rastreabilidade.csv    69 RF + 18 RNF
-│   └── adr/0001-tecnologias.md
-├── contracts/
-│   ├── telemetria.v1.schema.json
-│   ├── exemplo-rural.json
-│   ├── exemplo-urbano.json
-│   ├── openapi-starter.yaml
-│   └── asyncapi-starter.yaml
-├── infra/
-│   ├── compose.lab.yml
-│   └── mosquitto/mosquitto.conf
-├── services/
-│   ├── central/                      FastAPI + PostgreSQL, telemetria HTTP
-│   ├── mqtt-bridge/                  tradutor MQTT -> HTTP (experimental)
-│   └── edge/                         fila SQLite + reenvio (experimental)
-├── apps/web/                         painel React+TypeScript simples
-└── scripts/                          demonstração urbana, rural, MQTT, verificação e linux/
+```bash
+./scripts/linux/09-iniciar-protegido.sh
+./scripts/linux/10-validar-autorizacao.sh
 ```
 
-Além das pastas mostradas, `docs/05-arch-linux.md`, `docs/06-portabilidade-e-migracao.md` e `scripts/linux/` contêm as adaptações ao Arch.
+O script 09 cria automaticamente uma chave local e tokens temporários, guardados em arquivos ignorados pelo Git. Para entrar no painel no modo de demonstração, copie o conteúdo de `runtime/token-gestor.txt` para o campo **Token de acesso** (não envie esse token por chat). O arquivo expira em uma hora; para renová-lo, execute novamente o script 09. Use apenas no seu notebook com dados fictícios.
 
-Os exemplos foram elaborados para aprendizagem. O núcleo definitivo deve respeitar **contratos versionados, módulos desacoplados, segurança por inquilino e dispositivo, DLQ, barramento confiável, observabilidade e testes formais**.
+Para restaurar o modo aberto que executa os scripts antigos:
+
+```bash
+./scripts/linux/11-restaurar-laboratorio.sh
+```
+
+## Limites conhecidos
+
+- Contêineres vinculados ao endereço local 127.0.0.1; não publicar na Internet.
+- JWT HS256 emitido localmente, **sem login, OpenID Connect, MFA, revogação nem TLS**.
+- Fila SQLite da borda sem criptografia em repouso; MQTT de laboratório sem ACL/TLS.
+- Scripts antigos sem token não funcionam no modo protegido; use o modo aberto ou inclua autenticação na futura integração.
+- Testes unitários e smoke-tests didáticos não comprovam durabilidade 72h, escalabilidade nem RNFs da especificação.
+- O banco e as filas são mantidos nos volumes Docker; evite `docker compose down -v`.
+
+Consulte também [docs/05-arch-linux.md](docs/05-arch-linux.md) e [docs/08-painel-v030.md](docs/08-painel-v030.md) para entender os serviços existentes.

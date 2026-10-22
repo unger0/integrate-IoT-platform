@@ -13,3 +13,6 @@ evidencias/
 
 backups/
 *.sql.bak
+
+.env.protegido
+runtime/

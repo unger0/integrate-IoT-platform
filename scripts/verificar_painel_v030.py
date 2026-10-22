@@ -14,7 +14,7 @@ def get(path):
 health=get('/health')
 assert health['status']=='ok'
 version=get('/openapi.json')['info']['version']
-assert version=='0.3.0', f'API esperada 0.3.0; recebida {version}'
+assert version=='0.4.0', f'API esperada 0.4.0; recebida {version}'
 q=quote(TENANT,safe='')
 domains=get(f'/api/v1/catalogo/dominios?inquilino={q}')
 profiles=get(f'/api/v1/catalogo/perfis?inquilino={q}')
@@ -22,7 +22,7 @@ devices=get(f'/api/v1/dispositivos?inquilino={q}')
 assert domains['inquilino']==profiles['inquilino']==devices['inquilino']==TENANT
 assert isinstance(domains['dominios'], list) and isinstance(profiles['perfis'], list)
 assert isinstance(devices['dispositivos'], list)
-print('[OK] API central 0.3.0 funcionando')
+print('[OK] API central 0.4.0 funcionando')
 print(f"[OK] Domínios: {len(domains['dominios'])}; perfis: {len(profiles['perfis'])}; dispositivos: {len(devices['dispositivos'])}")
 if devices['dispositivos']:
     name=quote(devices['dispositivos'][0]['id'],safe='')

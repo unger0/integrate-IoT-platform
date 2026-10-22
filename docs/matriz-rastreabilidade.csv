@@ -51,16 +51,16 @@ RF-INT-05;INT;Dados de contexto em NGSI-LD;Importante;2-Integracao;17;Pendente;;
 RF-INT-06;INT;Sandbox e validador de mensagens;Importante;2-Integracao;17;Pendente;;;
 RF-INT-07;INT;Kit do integrador com exemplos e guias;Importante;2-Integracao;17;Pendente;;;
 RF-INT-08;INT;Mapeamento de campos JSON sem código;Desejável;3-Evolucao;18;Pendente;;;
-RF-OBS-01;OBS;Métricas Prometheus da plataforma;Essencial;1-MVP;20;Pendente;;;
-RF-OBS-02;OBS;Logs JSON com ID de correlação;Essencial;1-MVP;20;Pendente;;;
+RF-OBS-01;OBS;Métricas Prometheus da plataforma;Essencial;1-MVP;20;Parcial;;Teste endpoint /metrics e histograma HTTP;Métricas de API central somente em memória e sem coleta contínua
+RF-OBS-02;OBS;Logs JSON com ID de correlação;Essencial;1-MVP;20;Parcial;;Logs JSON da API e borda com correlação;Sem tracing distribuído e persistência garantida de logs
 RF-OBS-03;OBS;Rastreamento distribuído OpenTelemetry;Importante;2-Integracao;20;Pendente;;;
 RF-OBS-04;OBS;Painel de saúde das integrações e bordas;Importante;2-Integracao;20;Pendente;;;
 RF-OBS-05;OBS;Alertas de operação da plataforma;Importante;2-Integracao;20;Pendente;;;
 RF-PRO-01;PRO;Normalização e enriquecimento com metadados;Essencial;1-MVP;18;Pendente;;;
-RF-PRO-02;PRO;Regras de limite, ausência, janela e área;Essencial;1-MVP;18;Pendente;;;Verificar conflito com roteiro (se pertinente)
-RF-PRO-03;PRO;Ações: alarme, notificação, comando, webhook, tópico;Essencial;1-MVP;18;Pendente;;;Verificar conflito com roteiro (se pertinente)
+RF-PRO-02;PRO;Regras de limite, ausência, janela e área;Essencial;1-MVP;18;Parcial (pendente validação no Arch);;;"v0.5.0: limiar por dispositivo e alarmes; faltam condições/ações exigidas e homologação em ambiente real."
+RF-PRO-03;PRO;Ações: alarme, notificação, comando, webhook, tópico;Essencial;1-MVP;18;Parcial (pendente validação no Arch);;;"v0.5.0: limiar por dispositivo e alarmes; faltam condições/ações exigidas e homologação em ambiente real."
 RF-PRO-04;PRO;Agregações por hora/dia;Importante;2-Integracao;18;Pendente;;;
-RF-PRO-05;PRO;Ciclo de vida e severidade dos alarmes;Essencial;1-MVP;18;Pendente;;;
+RF-PRO-05;PRO;Ciclo de vida e severidade dos alarmes;Essencial;1-MVP;18;Parcial (pendente validação no Arch);;;"v0.5.0: limiar por dispositivo e alarmes; faltam condições/ações exigidas e homologação em ambiente real."
 RF-PRO-06;PRO;Extensão por funções externas via webhook;Desejável;3-Evolucao;18;Pendente;;;
 RF-SEG-01;SEG;Usuários por OIDC/OAuth 2.0, MFA admins;Essencial;1-MVP;19;Pendente;;;
 RF-SEG-02;SEG;Papéis de acesso e autorizações;Essencial;1-MVP;19;Pendente;;;

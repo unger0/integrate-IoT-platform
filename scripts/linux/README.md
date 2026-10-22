@@ -13,3 +13,5 @@
 | `08-validar-painel.sh` | Testa os novos endpoints e regras Python sem alterar dados |
 
 Executar desde qualquer diretório, chamando o caminho absoluto se necessário. Os scripts mudam para a raiz do projeto internamente. Leia `docs/05-arch-linux.md` antes de usar.
+| `18-validar-observabilidade.sh` | Valida resumo por organização e permissões de métricas, sem alterar registros |
+| `19-atualizar-v070.sh` | Backup e reconstrução v0.7.0 preservando o modo aberto ou JWT de laboratório |

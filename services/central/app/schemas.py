@@ -84,3 +84,20 @@ class VinculoPerfil(BaseModel):
     model_config = ConfigDict(extra='forbid')
     inquilino: str = Field(min_length=1)
     perfil: str = Field(min_length=1)
+
+
+class RegraLimiar(BaseModel):
+    """Regra simples de condição -> alarme, vinculada a um único dispositivo."""
+    model_config = ConfigDict(extra='forbid')
+    inquilino: str = Field(min_length=1)
+    nome: str = Field(min_length=1, max_length=120)
+    dispositivo: str = Field(min_length=1)
+    grandeza: str = Field(min_length=1)
+    unidade: str = Field(min_length=1)
+    operador: Literal['maior_que', 'menor_que']
+    limite: float = Field(allow_inf_nan=False)
+    severidade: Literal['baixa', 'media', 'alta', 'critica'] = 'media'
+
+class AcaoAlarme(BaseModel):
+    model_config = ConfigDict(extra='forbid')
+    inquilino: str = Field(min_length=1)

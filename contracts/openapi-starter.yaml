@@ -1,7 +1,7 @@
 openapi: 3.0.3
 info:
   title: Plataforma IoT Integrada - API inicial (laboratório)
-  version: 0.3.0
+  version: 0.7.0
   description: Apenas um subconjunto ilustrativo da API pretendida; a API de produção requer OIDC/RBAC e todos os contratos completos.
 servers:
   - url: http://localhost:8000
@@ -13,7 +13,7 @@ paths:
         '200': {description: OK}
   /api/v1/dispositivos:
     get:
-      summary: Listar até 500 dispositivos filtrados por inquilino (NÃO faz autorização)
+      summary: Listar até 500 dispositivos filtrados por inquilino (filtra por tenant (modo JWT demo opt-in))
       parameters:
         - {name: inquilino, in: query, required: true, schema: {type: string}}
         - {name: limite, in: query, required: false, schema: {type: integer, minimum: 1, maximum: 500}}
@@ -43,7 +43,7 @@ paths:
         '200': {description: Lista de medições}
   /api/v1/catalogo/dominios:
     get:
-      summary: Listar domínios da organização declarada (NÃO faz autorização)
+      summary: Listar domínios da organização declarada (filtra por tenant (modo JWT demo opt-in))
       parameters:
         - {name: inquilino, in: query, required: true, schema: {type: string}}
       responses:
@@ -70,3 +70,49 @@ paths:
       responses:
         '200': {description: Perfil vinculado}
         '400': {description: Perfil incompatível}
+
+  /api/v1/regras:
+    get:
+      summary: Listar regras de limiar da organização (laboratório)
+      responses:
+        '200': {description: Regras configuradas}
+    post:
+      summary: Criar regra simples por dispositivo/grandeza
+      responses:
+        '201': {description: Regra criada}
+        '403': {description: Papel ou organização recusados no modo JWT}
+  /api/v1/alarmes:
+    get:
+      summary: Consultar alarmes e seu estado
+      responses:
+        '200': {description: Alarmes registrados}
+  /api/v1/alarmes/{id}/reconhecer:
+    post:
+      summary: Reconhecer um alarme ativo
+      parameters:
+        - {name: id, in: path, required: true, schema: {type: integer}}
+      responses:
+        '200': {description: Alarme reconhecido}
+  /api/v1/alarmes/{id}/resolver:
+    post:
+      summary: Resolver manualmente um alarme em aberto
+      parameters:
+        - {name: id, in: path, required: true, schema: {type: integer}}
+      responses:
+        '200': {description: Alarme resolvido}
+
+  /api/v1/observabilidade/resumo:
+    get:
+      summary: Resumo historico de telemetria e alarmes por organizacao
+      parameters:
+        - {name: inquilino, in: query, required: true, schema: {type: string}}
+      responses:
+        '200': {description: Indicadores historicos filtrados por organizacao}
+        '403': {description: Papel ou organizacao nao autorizados}
+  /metrics:
+    get:
+      summary: Metricas globais Prometheus (fora do OpenAPI automatico)
+      description: No modo JWT, disponivel somente ao papel administrador. Em modo aberto, somente laboratorio local.
+      responses:
+        '200': {description: Formato texto Prometheus}
+        '403': {description: Permissao insuficiente}

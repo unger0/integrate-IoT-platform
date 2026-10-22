@@ -2,6 +2,8 @@
 Não expor a rede externa; não usar em produção.
 """
 import os,sqlite3,json,asyncio
+from datetime import datetime,timezone
+from uuid import uuid4
 from contextlib import asynccontextmanager, contextmanager
 from pathlib import Path
 from fastapi import FastAPI
@@ -10,6 +12,14 @@ import httpx
 SQLITE=Path(os.environ.get('SQLITE_PATH','/tmp/edge-lab.sqlite'))
 URL=os.environ.get('CENTRAL_URL','http://localhost:8000/api/v1/ingestao/lote')
 INTERVAL=int(os.environ.get('SYNC_INTERVAL_SECONDS','8'))
+BEARER=os.environ.get('IOT_LAB_EDGE_BEARER','')
+
+def log_event(event, **fields):
+    # Nao registra payloads de sensores, credenciais ou cabecalhos de autenticacao.
+    print(json.dumps({'timestamp':datetime.now(timezone.utc).isoformat(),
+        'level':'INFO','component':'no-borda','event':event,**fields},
+        ensure_ascii=False,separators=(',',':')),flush=True)
+
 
 @contextmanager
 def connection():
@@ -34,6 +44,7 @@ def enqueue(data):
         return False
     with connection() as db:
         db.execute('INSERT OR IGNORE INTO queue(id,payload) VALUES (?,?)',(message_id,json.dumps(data,ensure_ascii=False)))
+    log_event('mensagem_enfileirada',message_id=message_id)
     return True
 
 def pending():
@@ -53,9 +64,13 @@ async def sync_once():
     rows=pending()
     if not rows:
         return
+    correlation_id=str(uuid4())
     try:
+        headers={'X-Correlation-ID': correlation_id}
+        if BEARER:
+            headers['Authorization']='Bearer '+BEARER
         async with httpx.AsyncClient(timeout=10) as client:
-            response=await client.post(URL,json=[item for rid,item in rows])
+            response=await client.post(URL,json=[item for rid,item in rows],headers=headers)
             response.raise_for_status()
             result=response.json()
         confirmed=[]
@@ -64,8 +79,13 @@ async def sync_once():
             if isinstance(i,int) and 0<=i<len(rows) and entry.get('status') in ('aceita','duplicada'):
                 confirmed.append(rows[i][0])
         forget(confirmed)
+        log_event('sincronizacao_lote',correlation_id=correlation_id,
+                  enviados=len(rows),confirmados=len(confirmed),pendentes=count())
+        for id_confirmado in confirmed:
+            log_event('mensagem_confirmada',correlation_id=correlation_id,message_id=id_confirmado)
     except (httpx.HTTPError,ValueError,KeyError) as exc:
-        print('Central inacessível ou erro de lote: fila preservada:',exc,flush=True)
+        log_event('sincronizacao_falhou',correlation_id=correlation_id,
+                  pendentes=count(),tipo_erro=type(exc).__name__)
 
 async def sync_loop():
     while True:

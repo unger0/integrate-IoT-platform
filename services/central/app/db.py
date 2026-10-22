@@ -66,6 +66,50 @@ CREATE TABLE IF NOT EXISTS measurements (
 ALTER TABLE measurements ADD COLUMN IF NOT EXISTS quality TEXT NOT NULL DEFAULT 'nao_avaliada';
 ALTER TABLE measurements ADD COLUMN IF NOT EXISTS quality_reason TEXT;
 CREATE INDEX IF NOT EXISTS measurements_time_idx ON measurements(device_id, measured_at DESC);
+-- Regras de limite: vinculadas explicitamente ao dispositivo e à organização.
+CREATE TABLE IF NOT EXISTS threshold_rules (
+    id BIGSERIAL PRIMARY KEY,
+    tenant_id TEXT NOT NULL,
+    name TEXT NOT NULL,
+    device_id TEXT NOT NULL REFERENCES devices(id),
+    measurement_name TEXT NOT NULL,
+    unit TEXT NOT NULL,
+    operator TEXT NOT NULL CHECK (operator IN ('maior_que','menor_que')),
+    threshold DOUBLE PRECISION NOT NULL CHECK (threshold > '-Infinity'::float8 AND threshold < 'Infinity'::float8),
+    severity TEXT NOT NULL CHECK (severity IN ('baixa','media','alta','critica')),
+    enabled BOOLEAN NOT NULL DEFAULT TRUE,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    UNIQUE(tenant_id, name)
+);
+CREATE INDEX IF NOT EXISTS threshold_rules_match_idx ON threshold_rules(device_id,measurement_name,enabled);
+CREATE TABLE IF NOT EXISTS alarms (
+    id BIGSERIAL PRIMARY KEY,
+    rule_id BIGINT NOT NULL REFERENCES threshold_rules(id),
+    device_id TEXT NOT NULL REFERENCES devices(id),
+    tenant_id TEXT NOT NULL,
+    severity TEXT NOT NULL,
+    status TEXT NOT NULL CHECK(status IN ('ativo','reconhecido','resolvido')),
+    initial_value DOUBLE PRECISION NOT NULL,
+    last_value DOUBLE PRECISION NOT NULL,
+    unit TEXT NOT NULL,
+    occurrences INTEGER NOT NULL DEFAULT 1,
+    first_measured_at TIMESTAMPTZ NOT NULL,
+    last_measured_at TIMESTAMPTZ NOT NULL,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    acknowledged_at TIMESTAMPTZ,
+    resolved_at TIMESTAMPTZ,
+    resolved_reason TEXT
+);
+CREATE UNIQUE INDEX IF NOT EXISTS alarms_open_unique_idx ON alarms(rule_id,device_id)
+    WHERE status IN ('ativo','reconhecido');
+CREATE INDEX IF NOT EXISTS alarms_tenant_time_idx ON alarms(tenant_id,created_at DESC);
+CREATE TABLE IF NOT EXISTS alarm_events (
+    id BIGSERIAL PRIMARY KEY,
+    alarm_id BIGINT NOT NULL REFERENCES alarms(id),
+    event_type TEXT NOT NULL,
+    actor TEXT NOT NULL,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
 CREATE TABLE IF NOT EXISTS last_state (
     device_id TEXT NOT NULL,
     measurement_name TEXT NOT NULL,
