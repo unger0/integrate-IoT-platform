@@ -1,4 +1,4 @@
-# Plataforma IoT Integrada — Arch Linux (kit de laboratório)
+# Plataforma IoT Integrada — Arch Linux (kit de laboratório, v0.3.0)
 
 **Ambiente principal:** notebook com Arch Linux; serviços em Docker Engine e Docker Compose; scripts em Bash/Python; frontend React opcional. 
 
@@ -16,11 +16,18 @@ Depois de extrair o ZIP e entrar nesta pasta:
 ./scripts/linux/00-verificar-ambiente.sh
 ./scripts/linux/01-iniciar-laboratorio.sh
 ./scripts/linux/02-demonstrar-fluxo.sh
+./scripts/linux/06-demonstrar-perfis.sh   # novo: cadastro e validação de perfis
 ./scripts/linux/03-teste-desconexao.sh    # opcional: interrompe/restaura só a API
 ./scripts/linux/04-encerrar-laboratorio.sh
 ```
 
+Para abrir a nova interface de gestão: `./scripts/linux/07-iniciar-painel.sh` (primeira execução instala bibliotecas npm). Teste somente-leitura dos novos endpoints: `./scripts/linux/08-validar-painel.sh`.
+
 Para MQTT experimental, use `./scripts/linux/05-demo-mqtt.sh`. Para frontend React: `cd apps/web && npm install && npm run dev`.
+
+**Novidade 0.3.0:** [docs/08-painel-v030.md](docs/08-painel-v030.md) — interface web de dispositivos, perfis e histórico, com dois endpoints de listagem. Preserva o fluxo de 0.2.0.
+
+**Histórico 0.2.0:** [docs/07-perfis-v020.md](docs/07-perfis-v020.md) — guia de atualização com backup e prova de classificação de leituras, mantendo a compatibilidade com o fluxo anterior.
 
 **Documentos:** [migração/portabilidade](docs/06-portabilidade-e-migracao.md) · [arquitetura](docs/01-arquitetura.md) · [roteiro](docs/02-roadmap-e-backlog.md) · [testes](docs/03-plano-de-testes.md) · [matriz de requisitos](docs/matriz-rastreabilidade.csv).
 

@@ -8,5 +8,8 @@
 | `03-teste-desconexao.sh` | Executa o ensaio que interrompe e restaura a API central |
 | `04-encerrar-laboratorio.sh` | Encerra contêineres e preserva volumes |
 | `05-demo-mqtt.sh` | Instala cliente MQTT em venv e envia leitura de laboratório |
+| `06-demonstrar-perfis.sh` | Exercita os perfis e a qualidade de medições |
+| `07-iniciar-painel.sh` | Instala dependências npm quando necessário e inicia React |
+| `08-validar-painel.sh` | Testa os novos endpoints e regras Python sem alterar dados |
 
 Executar desde qualquer diretório, chamando o caminho absoluto se necessário. Os scripts mudam para a raiz do projeto internamente. Leia `docs/05-arch-linux.md` antes de usar.

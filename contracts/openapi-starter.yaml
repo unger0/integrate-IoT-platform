@@ -1,7 +1,7 @@
 openapi: 3.0.3
 info:
   title: Plataforma IoT Integrada - API inicial (laboratório)
-  version: 0.1.0
+  version: 0.3.0
   description: Apenas um subconjunto ilustrativo da API pretendida; a API de produção requer OIDC/RBAC e todos os contratos completos.
 servers:
   - url: http://localhost:8000
@@ -12,6 +12,13 @@ paths:
       responses:
         '200': {description: OK}
   /api/v1/dispositivos:
+    get:
+      summary: Listar até 500 dispositivos filtrados por inquilino (NÃO faz autorização)
+      parameters:
+        - {name: inquilino, in: query, required: true, schema: {type: string}}
+        - {name: limite, in: query, required: false, schema: {type: integer, minimum: 1, maximum: 500}}
+      responses:
+        '200': {description: Inventário filtrado}
     post:
       summary: Cadastrar dispositivo (laboratório, sem emissão de credenciais)
       responses:
@@ -34,3 +41,32 @@ paths:
         - {name: id, in: path, required: true, schema: {type: string}}
       responses:
         '200': {description: Lista de medições}
+  /api/v1/catalogo/dominios:
+    get:
+      summary: Listar domínios da organização declarada (NÃO faz autorização)
+      parameters:
+        - {name: inquilino, in: query, required: true, schema: {type: string}}
+      responses:
+        '200': {description: Domínios cadastrados}
+    post:
+      summary: Criar domínio da organização (laboratório)
+      responses:
+        '201': {description: Domínio cadastrado}
+  /api/v1/catalogo/perfis:
+    post:
+      summary: Criar perfil e faixas de grandezas (laboratório)
+      responses:
+        '201': {description: Perfil criado}
+        '409': {description: Perfil já cadastrado}
+    get:
+      summary: Listar perfis pelo parâmetro inquilino
+      responses:
+        '200': {description: Relação de perfis}
+  /api/v1/dispositivos/{id}/perfil:
+    put:
+      summary: Vincular um perfil a dispositivo existente
+      parameters:
+        - {name: id, in: path, required: true, schema: {type: string}}
+      responses:
+        '200': {description: Perfil vinculado}
+        '400': {description: Perfil incompatível}

@@ -7,7 +7,7 @@ RF-APP-05;APP;Notificações email/mensagens/SMS;Importante;2-Integracao;19;Pend
 RF-APP-06;APP;Interface web responsiva e leve;Importante;2-Integracao;19;Pendente;;;
 RF-APP-07;APP;Paginação, filtros e ordenação consistentes;Essencial;1-MVP;19;Pendente;;;
 RF-CEN-01;CEN;Domínios configuráveis por inquilino;Essencial;1-MVP;15;Pendente;;;
-RF-CEN-02;CEN;Perfis com grandezas, unidades, faixas e intervalos;Essencial;1-MVP;15;Pendente;;;
+RF-CEN-02;CEN;Perfis com grandezas, unidades, faixas e intervalos;Essencial;1-MVP;15;Parcial (a validar no Arch);;;"v0.2.0: catálogo de grandezas/faixas e marcação de suspeitas, intervalo armazenado; pendente critérios completos e teste end-to-end no notebook."
 RF-CEN-03;CEN;Hierarquia inquilino > site > área > dispositivo;Essencial;1-MVP;15;Pendente;;;
 RF-CEN-04;CEN;Geometrias GeoJSON e consultas espaciais;Importante;2-Integracao;15;Pendente;;;
 RF-CEN-05;CEN;Modelos prontos de cenários urbano e rural;Desejável;3-Evolucao;15;Pendente;;;

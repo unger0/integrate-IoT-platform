@@ -10,3 +10,6 @@ dist/
 .venv/
 .pytest_cache/
 evidencias/
+
+backups/
+*.sql.bak

@@ -1,12 +1,12 @@
 from datetime import datetime
 from typing import Literal
 from uuid import UUID
-from pydantic import BaseModel, Field, ConfigDict, field_validator
+from pydantic import BaseModel, Field, ConfigDict, field_validator, model_validator
 
 class Medida(BaseModel):
     model_config = ConfigDict(extra='forbid')
     grandeza: str = Field(min_length=1)
-    valor: float
+    valor: float = Field(allow_inf_nan=False)
     unidade: str = Field(min_length=1)
 
 class Local(BaseModel):
@@ -34,12 +34,53 @@ class Telemetria(BaseModel):
         return value
 
 class NovoDispositivo(BaseModel):
+    model_config = ConfigDict(extra='forbid')
     id: str = Field(min_length=1)
     inquilino: str = Field(min_length=1)
     dominio: str = Field(min_length=1)
     site: str = Field(min_length=1)
     area: str | None = None
+    perfil: str | None = None
+    fabricante: str | None = None
+    firmware: str | None = None
 
 class NovoDominio(BaseModel):
     inquilino: str = Field(min_length=1)
     nome: str = Field(min_length=1)
+
+
+class GrandezaPerfil(BaseModel):
+    """Parâmetros de uma grandeza, configurados por organização."""
+    model_config = ConfigDict(extra='forbid')
+    grandeza: str = Field(min_length=1)
+    unidade: str = Field(min_length=1)
+    minimo: float = Field(allow_inf_nan=False)
+    maximo: float = Field(allow_inf_nan=False)
+
+    @model_validator(mode='after')
+    def validate_range(self):
+        if self.minimo > self.maximo:
+            raise ValueError('minimo não pode ser maior que maximo')
+        return self
+
+
+class NovoPerfil(BaseModel):
+    model_config = ConfigDict(extra='forbid')
+    inquilino: str = Field(min_length=1)
+    nome: str = Field(min_length=1)
+    dominio: str = Field(min_length=1)
+    intervalo_esperado_segundos: int = Field(ge=1, le=2_592_000)
+    medidas: list[GrandezaPerfil] = Field(min_length=1, max_length=50)
+
+    @model_validator(mode='after')
+    def validate_unique_measurements(self):
+        nomes = [item.grandeza for item in self.medidas]
+        if len(nomes) != len(set(nomes)):
+            raise ValueError('grandezas não podem se repetir no perfil')
+        return self
+
+
+class VinculoPerfil(BaseModel):
+    model_config = ConfigDict(extra='forbid')
+    inquilino: str = Field(min_length=1)
+    perfil: str = Field(min_length=1)
